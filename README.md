@@ -12,14 +12,26 @@ conda activate gpu
 ```python
 import torch
 
-print(torch.cuda.is_available())        # should be True
-print(torch.cuda.device_count())        # should be 2
-print(torch.cuda.get_device_name(0))    # T500
-print(torch.cuda.get_device_name(1))    # RTX 3060
+# How many GPUs?
+print("CUDA available:", torch.cuda.is_available())
+print("GPU count:", torch.cuda.device_count())
 
-# Force training on RTX 3060
-device = torch.device("cuda:1")
-model.to(device)
+# Name of each GPU
+for i in range(torch.cuda.device_count()):
+    print(i, torch.cuda.get_device_name(i))
 
+# Memory usage
+print("Memory allocated:", torch.cuda.memory_allocated(device) / 1024**2, "MB")
+print("Max memory allocated:", torch.cuda.max_memory_allocated(device) / 1024**2, "MB")
+print("Memory reserved:", torch.cuda.memory_reserved(device) / 1024**2, "MB")
+
+# Clear cache
+torch.cuda.empty_cache()
+
+# Dosplay CLI tool output nvidia-smi
+!nvidia-smi
+
+# For live tracking in Terminal, use built-in loop option
+# nvidia-smi -l 1
 ```
 
