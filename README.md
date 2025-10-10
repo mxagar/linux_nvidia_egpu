@@ -126,6 +126,56 @@ sudo apt install -y \
   clang \
   valgrind \
   ninja-build
+
+# -- Docker
+
+# Prerequisites
+sudo apt update
+sudo apt install ca-certificates curl gnupg lsb-release -y
+
+# Add official Docker's GPG Key
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+
+# Add Docker repo
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
+  https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+# Install Docker Engine + CLI + Compose
+sudo apt update
+sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
+
+# Enable and start docker service
+sudo systemctl enable docker
+sudo systemctl start docker
+
+# Check docker is running
+sudo systemctl status docker
+
+# Add your our user to the docker group to run without sudo
+sudo groupadd -f docker
+sudo usermod -aG docker $USER
+newgrp docker
+groups  # verify docker appears as our group
+
+# Test
+docker run hello-world
+
+# Enable NVIDIA support
+sudo apt update
+
+
+sudo apt install -y nvidia-container-toolkit
+sudo nvidia-ctk runtime configure --runtime=docker
+sudo systemctl restart docker
+
+# Test GPU passthrough
+docker run --rm --gpus all nvidia/cuda:12.4.1-base-ubuntu22.04 nvidia-smi
+
 ```
 
 ### Step 3: Install and Configure NVIDIA and GPU Related Libraries
