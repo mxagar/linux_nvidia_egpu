@@ -9,6 +9,7 @@ Table of contents:
     - [Step 0: Hardware Requirements](#step-0-hardware-requirements)
     - [Step 1: Install Ubuntu](#step-1-install-ubuntu)
     - [Step 2: Install Basic Development Software via CLI](#step-2-install-basic-development-software-via-cli)
+      - [Docker Installation with NVIDIA GPU Support](#docker-installation-with-nvidia-gpu-support)
     - [Step 3: Install and Configure NVIDIA and GPU Related Libraries](#step-3-install-and-configure-nvidia-and-gpu-related-libraries)
       - [eGPU Switcher](#egpu-switcher)
     - [Step 4: Check](#step-4-check)
@@ -127,6 +128,12 @@ sudo apt install -y \
   valgrind \
   ninja-build
 
+
+```
+
+#### Docker Installation with NVIDIA GPU Support
+
+```bash
 # -- Docker
 
 # Prerequisites
@@ -166,14 +173,30 @@ groups  # verify docker appears as our group
 docker run hello-world
 
 # Enable NVIDIA support
+# https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/
+# Download latest NVIDIA packages
+# https://github.com/NVIDIA/libnvidia-container/releases
+# https://github.com/NVIDIA/nvidia-container-toolkit/releases
+
 sudo apt update
 
+sudo mkdir -p /etc/apt/keyrings
+curl -fsSL https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/3bf863cc.pub \
+  | sudo gpg --dearmor -o /etc/apt/keyrings/nvidia.gpg
 
+echo "deb [signed-by=/etc/apt/keyrings/nvidia.gpg] \
+https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/ /" \
+  | sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list > /dev/null
+
+
+sudo apt update
 sudo apt install -y nvidia-container-toolkit
+
+
 sudo nvidia-ctk runtime configure --runtime=docker
 sudo systemctl restart docker
 
-# Test GPU passthrough
+# Test GPU passthrough: We should see the output of nvidia-smi where our GPUs appear
 docker run --rm --gpus all nvidia/cuda:12.4.1-base-ubuntu22.04 nvidia-smi
 
 ```
