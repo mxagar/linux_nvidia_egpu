@@ -317,6 +317,7 @@ sudo ufw reload
 sudo ufw allow ssh
 # If Firewall enabled: Allow Ollama port(s)
 sudo ufw allow 11434/tcp
+sudo ufw allow 11435/tcp
 # Print status
 sudo ufw status verbose
 ```
@@ -453,8 +454,8 @@ Thanks to the VSCode [Remote-SSH Extension](https://code.visualstudio.com/docs/r
 
 Pre-requisites: 
 
-- Install the [Remote-SSH Extension](https://code.visualstudio.com/docs/remote/ssh).
-- Set up the Ubuntu machine as explained above.
+- Install the [Remote-SSH Extension](https://code.visualstudio.com/docs/remote/ssh). The section [Minimum VSCode Extensions](#minimum-vscode-extensions) below lists the extensions I frequently use.
+- Set up the Ubuntu machine as explained above: sections [Install Linux](#install-linux) and [Using the GPU](#using-the-gpu).
 - Register the GPU environment to appear in the Jupyter Kernel list, as shown in the following:
 
 ```bash
@@ -469,10 +470,30 @@ conda activate gpu
 python -m ipykernel install --user --name=gpu --display-name "Python (gpu)"
 ```
 
-After that, we can easily 
+After that, we can easily open a VSCode instance on our Macbook and connect to the Ubuntu from it:
 
+- Click on the button *Open a Remote Window*, on the bottom left corner.
+- Connect to a host...
+- Enter: `<user>@<ubuntu-ip>` or, if configured `<user>@<ubuntu-hostname>.local`
+- Enter Ubuntu user password
+- ... et voilà! Our VSCode on the Macbook is actually running on Ubuntu.
+
+Now, we can open the VSCode Terminal, which will launch on Ubuntu.
+
+Alternatively, we can open the explorer view and select the folder we'd like to open.
+
+If we open the current repository, we can run the notebook [`test_gpu.ipynb`](./test_gpu.ipynb) and we should get the GPU outputs as on the Ubuntu machine.
 
 ### Ollama Server: Use Ollama LLMs Running on the GPU-Ubuntu, but from Another Machine
+
+Analogously to the VSCode use case, let's consider this scenario:
+
+- we have our usual workstation, which is a Macbook
+- and we also have another machine with a GPU, i.e., the Ubuntu we have configured so far.
+
+Now, we'd like to work on the Macbook but use the powerful GPU from the Ubuntu to run an LLM.
+
+To that end, assuming our Ubuntu is configured as explained in the section sections [Install Linux](#install-linux) and [Using the GPU](#using-the-gpu), we can install and test [Ollama](https://ollama.com/) on our Ubuntu:
 
 ```bash
 # Install Ollama CLI and a the service ollama.service
@@ -526,6 +547,8 @@ systemctl --user enable ollama
 systemctl --user disable ollama
 ```
 
+Since our firewall is configured to allow connections on the Ollama ports (see [Step 6: Remote Access Configuration](#step-6-remote-access-configuration)), we can simply 
+
 ## Extra: Minimum Personal Migration Checklist
 
 ### Minimum Software Setup
@@ -554,17 +577,17 @@ systemctl --user disable ollama
 
 ### Minimum VSCode Extensions
 
+- **Remote-SSH**
 - Python
-- C/C++
-- Markdown all in one
 - Jupyter
-- CMake Tools
 - DotENV
-- Remote-SSH
 - Remote Development
 - YAML
 - LiveShare
 - Github Copilot + Copilot Chat
+- CMake Tools
+- C/C++
+- Markdown all in one
 - vscode-icons
 
 ### Configuration
@@ -605,6 +628,6 @@ ln -s /media/$USER/poseidon/data ~/data
 
 ## Sources, Related Links
 
-- https://gist.github.com/tanmayyb/d19f9aa5641349f8830d05e2c91d5a79
-- https://www.reddit.com/r/framework/comments/11dtm78/guide_for_setting_up_egpu_with_framework_11th_gen/
-- https://gist.github.com/valteu/1c0a9b7288cc3d77a6654a4d22d0ce9f
+- [Enable Razer CoreX (NV-1070) eGPU on Razer Blade Stealth (NV-MX150) running Ubuntu 20.04](https://gist.github.com/tanmayyb/d19f9aa5641349f8830d05e2c91d5a79)
+- [Guide for setting up e-gpu with framework 11th gen and Ubuntu 22.04](https://www.reddit.com/r/framework/comments/11dtm78/guide_for_setting_up_egpu_with_framework_11th_gen/)
+- [Guide to install nvidia eGpu on ubuntu 22.04](https://gist.github.com/valteu/1c0a9b7288cc3d77a6654a4d22d0ce9f)
