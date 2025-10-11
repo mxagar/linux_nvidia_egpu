@@ -9,11 +9,11 @@ Table of contents:
     - [Step 0: Hardware Requirements](#step-0-hardware-requirements)
     - [Step 1: Install Ubuntu](#step-1-install-ubuntu)
     - [Step 2: Install Basic Development Software via CLI](#step-2-install-basic-development-software-via-cli)
-      - [Docker Installation with NVIDIA GPU Support](#docker-installation-with-nvidia-gpu-support)
     - [Step 3: Install and Configure NVIDIA and GPU Related Libraries](#step-3-install-and-configure-nvidia-and-gpu-related-libraries)
       - [eGPU Switcher](#egpu-switcher)
     - [Step 4: Check](#step-4-check)
-    - [Step 5: (Optional) Basic Additional Configuration](#step-5-optional-basic-additional-configuration)
+    - [Step 5: Install Docker with NVIDIA GPU Support](#step-5-install-docker-with-nvidia-gpu-support)
+    - [Step 6: Basic Additional Configuration](#step-6-basic-additional-configuration)
   - [Using the GPU](#using-the-gpu)
     - [Python Environment](#python-environment)
     - [Pytorch Example](#pytorch-example)
@@ -31,6 +31,20 @@ Table of contents:
 
 ### Step 0: Hardware Requirements
 
+We need:
+
+- a laptop,
+- a GPU,
+- and an external GPU case to contain the GPU and connect it to the laptop.
+
+Additionally, we should consider these requirements:
+
+- The laptop needs to have Thunderbolt 3 or superior port: here's where we're going to connect our external GPU.
+- Also, the laptop needs to have an NVIDIA GPU chip: devices which have graphics cards from other vendors than NVIDIA tend to have issues when NVIDIA drivers are installed; therefore, I would recommend a laptop which already has an integrated NVIDIA GPU, even though we will use the external, more powerful one.
+- Make sure that the external GPU case supports our concrete GPU.
+
+Specifically, this is my setup:
+
 - [Lenovo ThinkPad P14s Gen 2i](https://www.lenovo.com/gb/en/p/laptops/thinkpad/thinkpadp/p14s-amd-g1/22wsp144sa1)
 	- **Graphics Card (GPU): Quadro T500 Mobile**
 	- 11th Gen Intel(R) Core(TM) i7-1165G7 @ 2.80GHz, x86_64
@@ -38,19 +52,11 @@ Table of contents:
 - [Gigabyte NVIDIA GeForce RTX 3060 Gaming OC 12 GB V2 LHR](https://www.gigabyte.com/Graphics-Card/GV-N3060GAMING-OC-12GD-rev-20)
 - [Razer Core X External Case for Thunderbolt 3 Graphics Card](https://www.razer.com/mena-en/gaming-laptops/razer-core-x)
 
-
-
-- Thunderbolt 3 or superior: here's where we're going to connect our external GPU.
-- NVIDIA GPU chip: devices which have graphics cards from other vendors than NVIDIA tend to have issues when NVIDIA drivers are installed; therefore, I would recommend a laptop which already has an integrated NVIDIA GPU, even though we will use the external, more powerful one.
-
 ### Step 1: Install Ubuntu
-
-
-
 
 Summary of the steps to follow:
 
-- [Donwload the Ubuntu Desktop](https://ubuntu.com/download/desktop) version for you architecture. In my case, I downloaded version 25.04 for Intel/AMD64.
+- [Donwload the Ubuntu Desktop](https://ubuntu.com/download/desktop) version for you architecture. My current version is 25.04 for Intel/AMD64.
 - Create a Flash drive with the downloaded image using [Balena Etcher](https://etcher.balena.io/).
 - [Install Ubuntu using the flashed USB drive](https://canonical-ubuntu-desktop-documentation.readthedocs-hosted.com/en/latest/tutorial/install-ubuntu-desktop/):
   - Back up any files or data you have on your computer.
@@ -63,9 +69,10 @@ Summary of the steps to follow:
   - No Active Directory
   - Bitlocker warnings: I decided to wipe out the disk.
 
-If we need to upgrade to a newer version (e.g., [from 24.04 to 25.04](https://www.omgubuntu.co.uk/2024/10/how-to-upgrade-to-ubuntu-24-10)), we 
+I originally installed the Ubuntu version `24.04`, but it lead to random freezes. Apparently, that could be related some incompabilities between the Desktop GUI and the NVIDIA drivers.
+In case you need to perform an upgrade, you can check this post [from 24.04 to 25.04](https://www.omgubuntu.co.uk/2024/10/how-to-upgrade-to-ubuntu-24-10).
 
-
+To upgrade versions via CLI and check the version we have:
 
 ```bash
 # Configure *Software Updater* (in App Center): 
@@ -77,16 +84,14 @@ sudo apt full-upgrade
 lsb_release -a
 ```
 
-If we face any issues regarding the access to eGPU via Thunderbolt.
+If we face any issues regarding the access to eGPU via Thunderbolt, we might need to grant access to it:
 
-
-1. In the UEFI BIOS menu, find a *Security* tab/option, and set the Thunderbolt security option to be *Unrestricted*.
+1. In the UEFI BIOS menu, look for a *Security* tab/option, and set the Thunderbolt security option to be *Unrestricted*.
 2. Ubuntu Settings UI: Privacy & Security > Thunderbolt: *allow access to devices*, such as GPUs.
 
-
-
-
 ### Step 2: Install Basic Development Software via CLI
+
+Here, I list the basic development tools I installed via CLI:
 
 ```bash
 sudo apt update
@@ -129,11 +134,77 @@ sudo apt install -y \
   ninja-build
 ```
 
-#### Docker Installation with NVIDIA GPU Support
+### Step 3: Install and Configure NVIDIA and GPU Related Libraries
+
+
+
+Apps: Open Software & Updates
+- Settings
+- Additional drivers: NVIDIA selected
+	- Using NVIDIA driver nvidia-driver-580-open
+	- Driver version 580 is the latest, but that lead to random freezes on Ubuntu 24.04
+- If no NVIDIA available, follow https://gist.github.com/tanmayyb/d19f9aa5641349f8830d05e2c91d5a79
+	- Disable Nouveau drivers
+- Install NVIDIA stuff via CLI
 
 ```bash
-# -- Docker
+# Use this, otherwise freezing problems
+sudo apt install nvidia-driver-580-open
 
+# Tools
+sudo apt-get nvidia-smi
+sudo apt-get install nvidia-settings
+```
+
+Install the CUDA Toolkit. In addition to the drivers, we sometimes need the toolkit:
+https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=24.04&target_type=deb_local
+Linux / x86_64 / Ubuntu / 24.04 / deb (local)
+
+
+```bash
+wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-ubuntu2404.pin
+
+sudo mv cuda-ubuntu2404.pin /etc/apt/preferences.d/cuda-repository-pin-600
+
+wget https://developer.download.nvidia.com/compute/cuda/13.0.1/local_installers/cuda-repo-ubuntu2404-13-0-local_13.0.1-580.82.07-1_amd64.deb
+
+sudo dpkg -i cuda-repo-ubuntu2404-13-0-local_13.0.1-580.82.07-1_amd64.deb
+
+sudo cp /var/cuda-repo-ubuntu2404-13-0-local/cuda-*-keyring.gpg /usr/share/keyrings/
+
+sudo apt-get update
+
+sudo apt-get -y install cuda-toolkit-13-0
+
+sudo apt install nvidia-cuda-toolkit
+```
+
+#### eGPU Switcher
+
+- https://github.com/hertg/egpu-switcher
+- https://github.com/hertg/egpu-switcher/releases (0.20.1 in my case)
+
+```bash
+sudo cp Downloads/egpu-switcher-amd64 /opt/egpu-switcher
+sudo chmod 755 /opt/egpu-switcher
+sudo ln -s /opt/egpu-switcher /usr/bin/egpu-switcher
+sudo egpu-switcher enable
+```
+
+### Step 4: Check
+
+
+```bash
+# Single call
+nvidia-smi
+
+# Loop call for refeshed outputs
+nvidia-smi -l 1
+```
+
+### Step 5: Install Docker with NVIDIA GPU Support
+
+```bash
 # Prerequisites
 sudo apt update
 sudo apt install ca-certificates curl gnupg lsb-release -y
@@ -207,73 +278,7 @@ sudo systemctl restart docker
 docker run --rm --gpus all nvidia/cuda:12.4.1-base-ubuntu22.04 nvidia-smi
 ```
 
-### Step 3: Install and Configure NVIDIA and GPU Related Libraries
-
-Apps: Open Software & Updates
-- Settings
-- Additional drivers: NVIDIA selected
-	- Using NVIDIA driver nvidia-driver-580-open
-	- Driver version 580 is the latest, but that lead to random freezes on Ubuntu 24.04
-- If no NVIDIA available, follow https://gist.github.com/tanmayyb/d19f9aa5641349f8830d05e2c91d5a79
-	- Disable Nouveau drivers
-- Install NVIDIA stuff via CLI
-
-```bash
-# Use this, otherwise freezing problems
-sudo apt install nvidia-driver-580-open
-
-# Tools
-sudo apt-get nvidia-smi
-sudo apt-get install nvidia-settings
-```
-
-Install the CUDA Toolkit. In addition to the drivers, we sometimes need the toolkit:
-https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=24.04&target_type=deb_local
-Linux / x86_64 / Ubuntu / 24.04 / deb (local)
-
-
-```bash
-wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-ubuntu2404.pin
-
-sudo mv cuda-ubuntu2404.pin /etc/apt/preferences.d/cuda-repository-pin-600
-
-wget https://developer.download.nvidia.com/compute/cuda/13.0.1/local_installers/cuda-repo-ubuntu2404-13-0-local_13.0.1-580.82.07-1_amd64.deb
-
-sudo dpkg -i cuda-repo-ubuntu2404-13-0-local_13.0.1-580.82.07-1_amd64.deb
-
-sudo cp /var/cuda-repo-ubuntu2404-13-0-local/cuda-*-keyring.gpg /usr/share/keyrings/
-
-sudo apt-get update
-
-sudo apt-get -y install cuda-toolkit-13-0
-
-sudo apt install nvidia-cuda-toolkit
-```
-
-#### eGPU Switcher
-
-- https://github.com/hertg/egpu-switcher
-- https://github.com/hertg/egpu-switcher/releases (0.20.1 in my case)
-
-```bash
-sudo cp Downloads/egpu-switcher-amd64 /opt/egpu-switcher
-sudo chmod 755 /opt/egpu-switcher
-sudo ln -s /opt/egpu-switcher /usr/bin/egpu-switcher
-sudo egpu-switcher enable
-```
-
-### Step 4: Check
-
-
-```bash
-# Single call
-nvidia-smi
-
-# Loop call for refeshed outputs
-nvidia-smi -l 1
-```
-
-### Step 5: (Optional) Basic Additional Configuration
+### Step 6: Basic Additional Configuration
 
 Settings: System: activate remote access options:
 
@@ -358,9 +363,6 @@ torch.cuda.empty_cache()
 
 ## Further Useful Applications
 
-
-
-
 ### VSCode Server
 
 ### Ollama Server
@@ -416,7 +418,6 @@ systemctl --user restart ollama
 systemctl --user enable ollama
 systemctl --user disable ollama
 ```
-
 
 ## Extra: Minimum Personal Migration Checklist
 
