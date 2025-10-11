@@ -127,8 +127,6 @@ sudo apt install -y \
   clang \
   valgrind \
   ninja-build
-
-
 ```
 
 #### Docker Installation with NVIDIA GPU Support
@@ -169,36 +167,44 @@ sudo usermod -aG docker $USER
 newgrp docker
 groups  # verify docker appears as our group
 
-# Test
+# Test: We should get a hello world greeting
 docker run hello-world
 
-# Enable NVIDIA support
-# https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/
-# Download latest NVIDIA packages
-# https://github.com/NVIDIA/libnvidia-container/releases
-# https://github.com/NVIDIA/nvidia-container-toolkit/releases
+# -- Enable NVIDIA support
 
+# We need to install 3 packages: libnvidia-container, libnvidia-container-tools, nvidia-container-toolkit
+# Their repos are here:
+#   https://github.com/NVIDIA/libnvidia-container/releases
+#   https://github.com/NVIDIA/nvidia-container-toolkit/releases
+# The latest version releases for me were:
+#   https://github.com/NVIDIA/nvidia-container-toolkit/releases/tag/v1.17.8
+#   https://github.com/NVIDIA/libnvidia-container/releases/tag/v1.17.8
+# However, I couldn't find any readily compiled DEB packages there, just code
+# and thanks to google I found this other official package repository:
+#   https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/
+# So I added the link to the repo list and then installed the packages automatically
+
+# Add keys: 3bf863cc.pub is the official NVIDIA's signing key, located in the package repo
 sudo apt update
-
 sudo mkdir -p /etc/apt/keyrings
 curl -fsSL https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/3bf863cc.pub \
   | sudo gpg --dearmor -o /etc/apt/keyrings/nvidia.gpg
 
+# Tell Ubuntu here's a new package source that can be trusted with the above specific key
 echo "deb [signed-by=/etc/apt/keyrings/nvidia.gpg] \
 https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/ /" \
   | sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list > /dev/null
 
-
+# Install packages
 sudo apt update
 sudo apt install -y nvidia-container-toolkit
 
-
+# Activate NVIDIA and restart docker daemon
 sudo nvidia-ctk runtime configure --runtime=docker
 sudo systemctl restart docker
 
 # Test GPU passthrough: We should see the output of nvidia-smi where our GPUs appear
 docker run --rm --gpus all nvidia/cuda:12.4.1-base-ubuntu22.04 nvidia-smi
-
 ```
 
 ### Step 3: Install and Configure NVIDIA and GPU Related Libraries
