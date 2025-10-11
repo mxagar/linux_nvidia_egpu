@@ -11,15 +11,15 @@ Table of contents:
     - [Step 2: Install Basic Development Software via CLI](#step-2-install-basic-development-software-via-cli)
     - [Step 3: Install and Configure NVIDIA and GPU Related Libraries](#step-3-install-and-configure-nvidia-and-gpu-related-libraries)
       - [eGPU Switcher](#egpu-switcher)
-    - [Step 4: Check](#step-4-check)
+    - [Step 4: Check the GPU](#step-4-check-the-gpu)
     - [Step 5: Install Docker with NVIDIA GPU Support](#step-5-install-docker-with-nvidia-gpu-support)
-    - [Step 6: Basic Additional Configuration](#step-6-basic-additional-configuration)
+    - [Step 6: Remote Access Configuration](#step-6-remote-access-configuration)
   - [Using the GPU](#using-the-gpu)
     - [Python Environment](#python-environment)
     - [Pytorch Example](#pytorch-example)
   - [Further Useful Applications](#further-useful-applications)
-    - [VSCode Server](#vscode-server)
-    - [Ollama Server](#ollama-server)
+    - [VSCode Server: Launch VSCode on Another Machine, but Hosted on the GPU-Ubuntu](#vscode-server-launch-vscode-on-another-machine-but-hosted-on-the-gpu-ubuntu)
+    - [Ollama Server: Use Ollama LLMs Running on the GPU-Ubuntu, but from Another Machine](#ollama-server-use-ollama-llms-running-on-the-gpu-ubuntu-but-from-another-machine)
   - [Extra: Minimum Personal Migration Checklist](#extra-minimum-personal-migration-checklist)
     - [Minimum Software Setup](#minimum-software-setup)
     - [Minimum VSCode Extensions](#minimum-vscode-extensions)
@@ -191,7 +191,7 @@ sudo ln -s /opt/egpu-switcher /usr/bin/egpu-switcher
 sudo egpu-switcher enable
 ```
 
-### Step 4: Check
+### Step 4: Check the GPU
 
 
 ```bash
@@ -278,13 +278,90 @@ sudo systemctl restart docker
 docker run --rm --gpus all nvidia/cuda:12.4.1-base-ubuntu22.04 nvidia-smi
 ```
 
-### Step 6: Basic Additional Configuration
+### Step 6: Remote Access Configuration
 
-Settings: System: activate remote access options:
+I will be working with two machines:
 
-- Secure Shell
-- Remote Desktop
+- The Ubuntu machine, which has a GPU attached to it.
+- A Macbook Pro as the main UI, from which I would like to connect to the Ubuntu machine whenever I need to use the GPU.
 
+In order to connect to our Ubuntu machine from the Mac, we need to
+
+- get our local Ubuntu IP (and/or its hostname)
+- set up the firewall on the Ubuntu machine
+- and allow to connect to specific ports.
+
+Here's how that's done:
+
+```bash
+# Get the IP of our Linux/Ubuntu - Local network
+# We might get (0) the localhost 127.0.0.1, (1) the Ethernet IP, (2) the WLAN IP, and (3) the Docker IP
+# We pick either the Ethernet or WLAN
+ip -4 addr show | grep inet  # 192.168.x.x
+# ... or
+ip route | grep default
+# ... or
+hostname -I
+
+# Check that the SSH server is installed and running
+sudo apt install -y openssh-server
+sudo systemctl enable --now ssh
+sudo systemctl status ssh
+
+# Setup firewall: enable/disable
+sudo ufw enable  # ... to enable
+sudo ufw disable  # ... to disable
+sudo ufw reload
+
+# If Firewall enabled: Allow SSH, SCP, VS Code Remote-SSH -- all port 22!
+sudo ufw allow ssh
+# If Firewall enabled: Allow Ollama port(s)
+sudo ufw allow 11434/tcp
+# Print status
+sudo ufw status verbose
+```
+
+Now, from our Mac, we should be able to access our Ubuntu if we are in the same local network:
+
+```bash
+# Use your username & IP obtained before
+ssh <username>@<ubuntu-ip>
+ssh mikel@192.168.x.x
+# Are you sure you want to connect? yes
+```
+
+We can also ssh to our local hostname; first, get the `hostname` on the Ubuntu machine:
+
+```bash
+hostname  # in my case, it's `urgull` 
+```
+
+Then, on the Mac, we can SSH to it as follows:
+
+```bash
+ssh <username>@<hostname>.local
+ssh mikel@urgull.local
+```
+
+It makes sense to use the `hostname`, since the local IP might change over time. 
+
+We can also register our Ubuntu machine in the `~/.ssh/config` of our Mac:
+
+```bash
+Host 192.168.x.x
+  HostName 192.168.x.x
+  User mikel
+
+Host urgull.local
+  HostName urgull.local
+  User mikel
+```
+
+Note that no one from the Internet can connect to our Ubuntu machine unless we explicitly expose it.
+
+- By default, no inbound connections from the Internet can reach internal IPs like `192.168.x.x`, because these are **local** IPs known only by our router.
+- Our router is visible to the Internet with another **different public IP**.
+- Our Ubuntu's SSH (port 22) and Ollama (port 11434) are not accessible from the Internet unless we manually tell our router to port-forward those ports.
 
 ## Using the GPU
 
@@ -363,9 +440,39 @@ torch.cuda.empty_cache()
 
 ## Further Useful Applications
 
-### VSCode Server
+### VSCode Server: Launch VSCode on Another Machine, but Hosted on the GPU-Ubuntu
 
-### Ollama Server
+Let's consider this scenario:
+
+- we have our usual workstation, which is a Macbook
+- and we also have another machine with a GPU, i.e., the Ubuntu we have configured so far.
+
+We'd like to work on the Macbook but use the powerful GPU from the Ubuntu.
+
+Thanks to the VSCode [Remote-SSH Extension](https://code.visualstudio.com/docs/remote/ssh), that's very easy to achieve!
+
+Pre-requisites: 
+
+- Install the [Remote-SSH Extension](https://code.visualstudio.com/docs/remote/ssh).
+- Set up the Ubuntu machine as explained above.
+- Register the GPU environment to appear in the Jupyter Kernel list, as shown in the following:
+
+```bash
+# On the Ubuntu machine
+
+# Activate the GPU env
+conda env list  # we should see, among others, the previously installed gpu env
+conda init bash
+conda activate gpu
+
+# Register the current environment as a Jupyter kernel, to appear in the VSCode Kernel list
+python -m ipykernel install --user --name=gpu --display-name "Python (gpu)"
+```
+
+After that, we can easily 
+
+
+### Ollama Server: Use Ollama LLMs Running on the GPU-Ubuntu, but from Another Machine
 
 ```bash
 # Install Ollama CLI and a the service ollama.service
@@ -443,6 +550,7 @@ systemctl --user disable ollama
   - ProtonMail
   - GitHub
   - SimpleLogin
+  - iCloud
 
 ### Minimum VSCode Extensions
 
