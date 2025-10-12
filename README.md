@@ -84,7 +84,7 @@ Summary of the steps to follow:
   - Bitlocker warnings: I decided to wipe out the disk.
 
 I originally installed the Ubuntu version `24.04`, but it lead to random freezes. Apparently, that could be related some incompabilities between the Desktop GUI and the NVIDIA drivers.
-In case you need to perform an upgrade, you can check this post [from 24.04 to 25.04](https://www.omgubuntu.co.uk/2024/10/how-to-upgrade-to-ubuntu-24-10).
+In case you need to perform an upgrade, you can check [this post](https://www.omgubuntu.co.uk/2024/10/how-to-upgrade-to-ubuntu-24-10).
 
 To upgrade versions via CLI and check the version we have:
 
@@ -98,7 +98,7 @@ sudo apt full-upgrade
 lsb_release -a
 ```
 
-If we face any issues regarding the access to eGPU via Thunderbolt, we might need to grant access to it:
+If we face any issues regarding the access to the eGPU via Thunderbolt, we might need to grant access to it:
 
 1. In the UEFI BIOS menu, look for a *Security* tab/option, and set the Thunderbolt security option to be *Unrestricted*.
 2. Ubuntu Settings UI: Privacy & Security > Thunderbolt: *allow access to devices*, such as GPUs.
@@ -150,7 +150,7 @@ sudo apt install -y \
 
 ### Step 3: Install and Configure NVIDIA and GPU Related Libraries
 
-If we follow the Ubuntu installation as specified, and our Laptop has already an integrated NVIDIA chip, we should have the NVIDIA drivers active already; we can check that in the `Software & Updates` app:
+If we follow the Ubuntu installation as specified and our Laptop has already an integrated NVIDIA chip, we should have the NVIDIA drivers active already; we can check that in the `Software & Updates` app:
 
 - Click on *Settings*
 - *Additional drivers*: check that a NVIDIA driver is selected; in my case, I have `nvidia-driver-580-open`.
@@ -166,7 +166,7 @@ sudo apt-get nvidia-smi
 sudo apt-get install nvidia-settings
 ```
 
-In addition to the drivers, we also need to [install the CUDA toolkit](https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=24.04&target_type=deb_local):
+In addition to the drivers, we also need to [install the CUDA toolkit](https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=24.04&target_type=deb_local).
 
 The recipe for a setup with `Linux / x86_64 / Ubuntu / 24.04 / deb (local)` is the following:
 
@@ -217,7 +217,7 @@ nvidia-smi -l 1
 
 ### Step 5: Install Docker with NVIDIA GPU Support
 
-Containerization is essential for many applications. And what about NVIDIA support? Follow this recipe to install [dcoker engine](https://www.docker.com/) with NVIDIA support.
+Containerization is essential for many applications. And what about containers with NVIDIA support? Follow this recipe to install [docker engine](https://www.docker.com/) with NVIDIA support.
 
 ```bash
 # Prerequisites
@@ -257,13 +257,13 @@ groups  # verify docker appears as our group
 docker run hello-world
 ```
 
-To **enable NVIDIA support**, we need to install 3 packages: `libnvidia-container, libnvidia-container-tools, nvidia-container-toolkit`.
-Their respective repositories with releases can be found here:
+To **enable NVIDIA support**, we need to install 3 packages: `libnvidia-container`, `libnvidia-container-tools`, and `nvidia-container-toolkit`.
+Their respective repositories can be found here:
 
 - [https://github.com/NVIDIA/libnvidia-container/releases](https://github.com/NVIDIA/libnvidia-container/releases)
 - [https://github.com/NVIDIA/nvidia-container-toolkit/releases](https://github.com/NVIDIA/nvidia-container-toolkit/releases)
 
-In my case, the latest stable version was `v1.17.8`:
+In my case, the latest stable release was `v1.17.8`:
 
 - [https://github.com/NVIDIA/nvidia-container-toolkit/releases/tag/v1.17.8](https://github.com/NVIDIA/nvidia-container-toolkit/releases/tag/v1.17.8)
 - [https://github.com/NVIDIA/libnvidia-container/releases/tag/v1.17.8](https://github.com/NVIDIA/libnvidia-container/releases/tag/v1.17.8)
@@ -417,9 +417,9 @@ In the following, I list some of the most common tool setups after the GPU insta
 
 ### Setting Up a GPU Python Environment
 
-One of the easiest ways to check 
+One of the easiest ways to handle Python environments in a data science context is Miniconda.
 
-First, we need to [install Miniconda](https://www.anaconda.com/docs/getting-started/miniconda/install):
+Here's how to [install Miniconda](https://www.anaconda.com/docs/getting-started/miniconda/install):
 
 ```bash
 cd ~
@@ -445,12 +445,19 @@ conda env create -f conda.yaml
 conda activate gpu
 ```
 
+The environment installs mainly Pytorch (with GPU support) and some additional basic libraries.
+
+I had some issues with `bitsandbytes`; re-installing it solved the issues:
+
 ```bash
+conda activate gpu
 pip uninstall bitsandbytes
 pip install bitsandbytes
 ```
 
 ### Quick Pytorch Example
+
+With the `gpu` environment, we can run this piece of code:
 
 ```python
 import torch
@@ -494,8 +501,8 @@ I will be adding more examples, if I consider them interesting and I get some ti
 
 Let's consider this scenario:
 
-- we have our usual workstation, which is a Macbook
-- and we also have another machine with a GPU, i.e., the Ubuntu we have configured so far.
+- we have our usual workstation, which is a Macbook (hostname `kasiopeia`)
+- and we also have another machine with a GPU, i.e., the Ubuntu we have configured so far (hostname: `urgull`).
 
 We'd like to work on the Macbook but use the powerful GPU from the Ubuntu.
 
@@ -511,7 +518,7 @@ Pre-requisites:
 # On the Ubuntu machine
 
 # Activate the GPU env
-conda env list  # we should see, among others, the previously installed gpu env
+conda env list  # we should see, among others, the previously installed `gpu` env
 conda init bash
 conda activate gpu
 
@@ -537,8 +544,8 @@ If we open the current repository, we can run the notebook [`test_gpu.ipynb`](./
 
 Analogously to the VSCode use case, let's consider this scenario:
 
-- we have our usual workstation, which is a Macbook
-- and we also have another machine with a GPU, i.e., the Ubuntu we have configured so far.
+- we have our usual workstation, which is a Macbook (hostname `kasiopeia`)
+- and we also have another machine with a GPU, i.e., the Ubuntu we have configured so far (hostname `urgull`).
 
 Now, we'd like to work on the Macbook but use the powerful GPU from the Ubuntu to run an LLM.
 
@@ -613,11 +620,11 @@ systemctl --user enable ollama
 systemctl --user disable ollama
 ```
 
-Since our firewall is configured to allow connections on the Ollama ports (see [Step 6: Remote Access Configuration](#step-6-remote-access-configuration)), we can simply
-
+Note that we have configured our firewall to allow connections on the Ollama ports.
+To force the Ollama server to use the GPUs, we can set the `OLLAMA_USE_GPU` variable:
 
 ```bash
-# Stop the Ollama service and start it again
+# Stop the Ollama service and start it again with GPU support
 sudo systemctl stop ollama
 export OLLAMA_USE_GPU=1
 export OLLAMA_HOST=0.0.0.0:11434
@@ -635,11 +642,9 @@ ollama serve &
 # Optionally, if we have models in different places, we can use:
 # export OLLAMA_MODELS=/usr/share/ollama/.ollama/models
 # export OLLAMA_MODELS=~/.ollama/models
-
-
 ``` 
 
-
+Then, we can use the Ollama API running on the Ubuntu machine from our Macbook:
 
 ```bash
 # Get the models we have available
@@ -647,19 +652,28 @@ curl http://<ubuntu_ip>:11434/api/tags
 curl http://<ubuntu-hostname>:11434/api/tags
 curl http://urgull.local:11434/api/tags
 
-
+# Run the generate API call
 curl http://urgull.local:11434/api/generate -d '{
   "model": "llama3:8b",
   "prompt": "Write a haiku about machine learning."
 }'
-
-
-# 
-export OLLAMA_HOST=127.0.0.1:11434
-export OLLAMA_HOST=urgull.local:11434
-ollama run llama3:8b
 ```
 
+If we install Ollama on the Macbook, we can even use the Ollama service on the Mac, but letting the model run on the Ubuntu with the more powerful GPU!
+
+```bash
+# Install Ollama on the Macbook
+curl -fsSL https://ollama.com/install.sh | sh
+
+# We can even run the local Ollama on Macbook
+# but using the Ubuntu server
+export OLLAMA_HOST=urgull.local:11434
+ollama run llama3:8b
+
+# To revert to use the local Macbook Ollama service
+export OLLAMA_HOST=127.0.0.1:11434
+ollama run llama3:8b
+```
 
 ## Extra: Minimum Personal Migration Checklist
 
