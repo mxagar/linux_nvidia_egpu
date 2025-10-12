@@ -15,8 +15,9 @@ Table of contents:
     - [Step 5: Install Docker with NVIDIA GPU Support](#step-5-install-docker-with-nvidia-gpu-support)
     - [Step 6: Remote Access Configuration](#step-6-remote-access-configuration)
   - [Using the GPU](#using-the-gpu)
-    - [Python Environment](#python-environment)
-    - [Pytorch Example](#pytorch-example)
+    - [Setting Up a GPU Python Environment](#setting-up-a-gpu-python-environment)
+    - [Quick Pytorch Example](#quick-pytorch-example)
+    - [Further Pytorch Tests in the Attached Notebook](#further-pytorch-tests-in-the-attached-notebook)
   - [Further Useful Applications](#further-useful-applications)
     - [VSCode Server: Launch VSCode on Another Machine, but Hosted on the GPU-Ubuntu](#vscode-server-launch-vscode-on-another-machine-but-hosted-on-the-gpu-ubuntu)
     - [Ollama Server: Use Ollama LLMs Running on the GPU-Ubuntu, but from Another Machine](#ollama-server-use-ollama-llms-running-on-the-gpu-ubuntu-but-from-another-machine)
@@ -41,7 +42,20 @@ Additionally, we should consider these requirements:
 
 - The laptop needs to have Thunderbolt 3 or superior port: here's where we're going to connect our external GPU.
 - Also, the laptop needs to have an NVIDIA GPU chip: devices which have graphics cards from other vendors than NVIDIA tend to have issues when NVIDIA drivers are installed; therefore, I would recommend a laptop which already has an integrated NVIDIA GPU, even though we will use the external, more powerful one.
-- Make sure that the external GPU case supports our concrete GPU.
+- If you are going to buy an NVIDIA GPU, consider the VRAM necessary to load the models you would like to run, and the amount of data you plan to hold in memory (i.e., the size of a batch); for instance:
+  - A batch of 128 RGB images of size 1024 x 1024 can weight between 0.75 GB (FP16) to 1.5 GB (FP32).
+  - The object detection model [YOLOv8](https://huggingface.co/Ultralytics/YOLOv8) (with around 68M params) requires between 130 MB (FP16) and 260 MB (FP32) in memory.
+  - Size of other vision models:
+    - [DETR-R50](https://huggingface.co/facebook/detr-resnet-50) (100 queries): 82 MB (FP16) to 164 (FP32)
+    - [DINO-R50](https://huggingface.co/docs/transformers/main/en/model_doc/dinov3): 120 (FP16) to 240 (FP32)
+    - [SAM-ViT-H](https://huggingface.co/docs/transformers/en/model_doc/sam): 1.25 GB (FP16) to 2.5 GB (FP32)
+  - Size of some popular, local Large Language Models (LLMs):
+    - [llama3:8b](https://ollama.com/library/llama3) via [Ollama](https://ollama.com/) requires 4.7 GB
+    - [gemma3:12b](https://ollama.com/library/gemma3): 8.1 GB
+    - [deepseek-r1:14b](https://ollama.com/library/deepseek-r1) 9.0 GB
+    - [gpt-oss:20b](https://ollama.com/library/gpt-oss): 14 GB
+    - ...
+- Last but not least: Make sure that the external GPU case supports our concrete GPU; cooling, number of pins, powr consumption -- not all combinations are compatile.
 
 Specifically, this is my setup:
 
@@ -136,16 +150,12 @@ sudo apt install -y \
 
 ### Step 3: Install and Configure NVIDIA and GPU Related Libraries
 
+If we follow the Ubuntu installation as specified, and our Laptop has already an integrated NVIDIA chip, we should have the NVIDIA drivers active already; we can check that in the `Software & Updates` app:
 
+- Click on *Settings*
+- *Additional drivers*: check that a NVIDIA driver is selected; in my case, I have `nvidia-driver-580-open`.
 
-Apps: Open Software & Updates
-- Settings
-- Additional drivers: NVIDIA selected
-	- Using NVIDIA driver nvidia-driver-580-open
-	- Driver version 580 is the latest, but that lead to random freezes on Ubuntu 24.04
-- If no NVIDIA available, follow https://gist.github.com/tanmayyb/d19f9aa5641349f8830d05e2c91d5a79
-	- Disable Nouveau drivers
-- Install NVIDIA stuff via CLI
+If that's not the case or we would like to update the drivers manually, we can do that via the CLI:
 
 ```bash
 # Use this, otherwise freezing problems
@@ -156,10 +166,9 @@ sudo apt-get nvidia-smi
 sudo apt-get install nvidia-settings
 ```
 
-Install the CUDA Toolkit. In addition to the drivers, we sometimes need the toolkit:
-https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=24.04&target_type=deb_local
-Linux / x86_64 / Ubuntu / 24.04 / deb (local)
+In addition to the drivers, we also need to [install the CUDA toolkit](https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=24.04&target_type=deb_local):
 
+The recipe for a setup with `Linux / x86_64 / Ubuntu / 24.04 / deb (local)` is the following:
 
 ```bash
 wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-ubuntu2404.pin
@@ -181,8 +190,11 @@ sudo apt install nvidia-cuda-toolkit
 
 #### eGPU Switcher
 
-- https://github.com/hertg/egpu-switcher
-- https://github.com/hertg/egpu-switcher/releases (0.20.1 in my case)
+Next, we need to install and enable the [`egpu-switcher`](https://github.com/hertg/egpu-switcher).
+
+On Linux, the system doesn't always automatically switch rendering or compute between your internal GPU and your external one (especially when you connect/disconnect the eGPU). The `egpu-switcher` makes that switching clean and reliable.
+
+In installed the latest [release tag 0.20.1](https://github.com/hertg/egpu-switcher/releases) after downloading the DEB package.
 
 ```bash
 sudo cp Downloads/egpu-switcher-amd64 /opt/egpu-switcher
@@ -193,6 +205,7 @@ sudo egpu-switcher enable
 
 ### Step 4: Check the GPU
 
+If we followed all the steps so far, `nvidia-smi` should be able to show the NVIDIA eGPU. If not, we should reboot with the eGPU connected and switched on.
 
 ```bash
 # Single call
@@ -203,6 +216,8 @@ nvidia-smi -l 1
 ```
 
 ### Step 5: Install Docker with NVIDIA GPU Support
+
+Containerization is essential for many applications. And what about NVIDIA support? Follow this recipe to install [dcoker engine](https://www.docker.com/) with NVIDIA support.
 
 ```bash
 # Prerequisites
@@ -240,9 +255,26 @@ groups  # verify docker appears as our group
 
 # Test: We should get a hello world greeting
 docker run hello-world
+```
 
-# -- Enable NVIDIA support
+To **enable NVIDIA support**, we need to install 3 packages: `libnvidia-container, libnvidia-container-tools, nvidia-container-toolkit`.
+Their respective repositories with releases can be found here:
 
+- [https://github.com/NVIDIA/libnvidia-container/releases](https://github.com/NVIDIA/libnvidia-container/releases)
+- [https://github.com/NVIDIA/nvidia-container-toolkit/releases](https://github.com/NVIDIA/nvidia-container-toolkit/releases)
+
+In my case, the latest stable version was `v1.17.8`:
+
+- [https://github.com/NVIDIA/nvidia-container-toolkit/releases/tag/v1.17.8](https://github.com/NVIDIA/nvidia-container-toolkit/releases/tag/v1.17.8)
+- [https://github.com/NVIDIA/libnvidia-container/releases/tag/v1.17.8](https://github.com/NVIDIA/libnvidia-container/releases/tag/v1.17.8)
+
+**However, I did not install them from that source.** Instead, I downloaded the compiled DEB packages from the following NVIDIA repository:
+
+[https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/](https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/)
+
+Here's the recipe I followed:
+
+```bash
 # We need to install 3 packages: libnvidia-container, libnvidia-container-tools, nvidia-container-toolkit
 # Their repos are here:
 #   https://github.com/NVIDIA/libnvidia-container/releases
@@ -282,8 +314,8 @@ docker run --rm --gpus all nvidia/cuda:12.4.1-base-ubuntu22.04 nvidia-smi
 
 I will be working with two machines:
 
-- The Ubuntu machine, which has a GPU attached to it.
-- A Macbook Pro as the main UI, from which I would like to connect to the Ubuntu machine whenever I need to use the GPU.
+- The Ubuntu machine (hostname `urgull`), which has a GPU attached to it.
+- A Macbook Pro as the main UI (hostname `kasiopeia`), from which I would like to connect to the Ubuntu machine whenever I need to use the GPU.
 
 In order to connect to our Ubuntu machine from the Mac, we need to
 
@@ -366,7 +398,10 @@ Note that no one from the Internet can connect to our Ubuntu machine unless we e
 
 ## Using the GPU
 
+If we follow all the steps in the previous section [Install Linux](#install-linux), we should have a GPU up and running on our machine; we can check that as follows:
+
 ```bash
+# On Ubuntu machine with eGPU connected before boot
 # Single call
 nvidia-smi
 
@@ -374,7 +409,13 @@ nvidia-smi
 nvidia-smi -l 1
 ```
 
-### Python Environment
+In the following, I list some of the most common tool setups after the GPU installation:
+
+- [Setting Up a GPU Python Environment](#setting-up-a-gpu-python-environment)
+- [Quick Pytorch Example](#quick-pytorch-example)
+- [Further Pytorch Tests in the Attached Notebook](#further-pytorch-tests-in-the-attached-notebook)
+
+### Setting Up a GPU Python Environment
 
 One of the easiest ways to check 
 
@@ -409,8 +450,7 @@ pip uninstall bitsandbytes
 pip install bitsandbytes
 ```
 
-### Pytorch Example
-
+### Quick Pytorch Example
 
 ```python
 import torch
@@ -438,6 +478,15 @@ torch.cuda.empty_cache()
 # For live tracking in Terminal, use built-in loop option
 # nvidia-smi -l 1
 ```
+
+### Further Pytorch Tests in the Attached Notebook
+
+The notebook [`test_gpu.ipynb`](./test_gpu.ipynb) contains some quick tests to showcase how to use the GPU:
+
+- Basic Sequential Neural Network
+- MNIST Training Test
+
+I will be adding more examples, if I consider them interesting and I get some time ;)
 
 ## Further Useful Applications
 
@@ -504,6 +553,10 @@ curl -fsSL https://ollama.com/install.sh | sh
 ollama pull llama3:8b
 ollama pull mistral
 ollama pull gemma:7b
+
+# Get a list of available models
+ollama list
+
 # Run the service
 # By default, tt should be running in OLLAMA_HOST=127.0.0.1:11434
 ollama run llama3:8b "Hello, are you running on my GPU?"
@@ -520,6 +573,12 @@ ollama ps
 # To stop AND OFFLOAD weights from GPU
 ollama stop llama3:8b
 
+# Show where the file is
+# Usually
+# /usr/share/ollama/.ollama/models
+# or ~/.ollama/models
+ollama show --file llama3:8b
+
 # Force GPU usage
 export OLLAMA_USE_GPU=1
 ollama run llama3:8b
@@ -529,9 +588,16 @@ ollama run llama3:8b
 # we can change it to 11435
 export OLLAMA_HOST=127.0.0.1:11435
 ollama serve &
-# To stop
-ps -ef | grep ollama # get PID
+# To stop:
+ps -ef | grep ollama  # get PID
+# ... or
+sudo lsof -i :11434  # get PID
+# ... and then stop it
 kill -9 <PID>
+
+# If Firewall enabled: Allow Ollama port(s)
+sudo ufw allow 11434/tcp
+sudo ufw allow 11435/tcp
 
 # Check the service is running
 systemctl --user status ollama
@@ -547,7 +613,53 @@ systemctl --user enable ollama
 systemctl --user disable ollama
 ```
 
-Since our firewall is configured to allow connections on the Ollama ports (see [Step 6: Remote Access Configuration](#step-6-remote-access-configuration)), we can simply 
+Since our firewall is configured to allow connections on the Ollama ports (see [Step 6: Remote Access Configuration](#step-6-remote-access-configuration)), we can simply
+
+
+```bash
+# Stop the Ollama service and start it again
+sudo systemctl stop ollama
+export OLLAMA_USE_GPU=1
+export OLLAMA_HOST=0.0.0.0:11434
+ollama serve &
+
+# If we have issues restarting the service
+# we can fetch its PID and fill it
+sudo lsof -i :11434
+sudo kill -9 <PID>
+# And the restart it
+export OLLAMA_USE_GPU=1
+export OLLAMA_HOST=0.0.0.0:11434
+ollama serve &
+
+# Optionally, if we have models in different places, we can use:
+# export OLLAMA_MODELS=/usr/share/ollama/.ollama/models
+# export OLLAMA_MODELS=~/.ollama/models
+
+
+``` 
+
+
+
+```bash
+# Get the models we have available
+curl http://<ubuntu_ip>:11434/api/tags
+curl http://<ubuntu-hostname>:11434/api/tags
+curl http://urgull.local:11434/api/tags
+
+
+curl http://urgull.local:11434/api/generate -d '{
+  "model": "llama3:8b",
+  "prompt": "Write a haiku about machine learning."
+}'
+
+
+# 
+export OLLAMA_HOST=127.0.0.1:11434
+export OLLAMA_HOST=urgull.local:11434
+ollama run llama3:8b
+```
+
 
 ## Extra: Minimum Personal Migration Checklist
 
