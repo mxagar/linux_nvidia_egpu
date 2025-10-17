@@ -18,3 +18,4 @@ docker rm excalidraw
 docker ps
 -->
 
+![eGPU Linux & Mac Setup](./assets/egpu_linux.png)
