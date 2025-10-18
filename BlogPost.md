@@ -54,3 +54,12 @@ Summary of steps
 
 ## Usage
 
+[test_gpu.ipynb](https://github.com/mxagar/linux_nvidia_egpu/blob/main/test_gpu.ipynb)
+
+Macbook vs NVIDIA comparison
+
+VSCode
+
+Ollama
+
+
