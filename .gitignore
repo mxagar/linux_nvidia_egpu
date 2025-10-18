@@ -210,3 +210,5 @@ __marimo__/
 # Data
 data
 #BlogPost.md
+.DS_Store
+.vscode
