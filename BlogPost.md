@@ -42,7 +42,14 @@ You might ask *why I would want to run and train models locally*, since we have 
 - <elaborate> **Learn** how to set up hardware, firmware software. </elaborate>
 - <elaborate> **Avoid dependence** on cloud services. </elaborate>
 
-You might also ask *why not stick to a single computer, Ubuntu or MacOS, with an attached eGPU*; 
+You might also ask *why not stick to a single computer, Ubuntu or MacOS, with an attached eGPU*. The question has several layers:
+
+- Even though I really like Ubuntu, MacOS offers in my opinion another level of use experience in general, which is more advanced the the Linux variant.
+- In the past, Intel-based Macs supported AMD eGPUs, but since the introduction of the Apple M1, that option is not feasible anymore. 
+- My preferred choice would be a MacOS with NVIDIA eGPU support, because NVIDIA chips are the industry standard.
+- Another option would be to upgrade my MacBook Pro M1 to a MacStudio M3 Ultra or similar, which comes with a very powerful processor -- but why should I leave aside my perfectly working M1?
+
+
 
 ## Setup
 
