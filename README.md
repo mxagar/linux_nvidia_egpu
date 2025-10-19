@@ -2,10 +2,12 @@
 
 Notes on how to use NVIDIA eGPUs on Linux.
 
+For more information on the motivation, check my blog post: [https://github.com/mxagar/linux_nvidia_egpu](https://github.com/mxagar/linux_nvidia_egpu),
+
 Table of contents:
 
 - [NVIDIA eGPU on Linux](#nvidia-egpu-on-linux)
-  - [Install Linux](#install-linux)
+  - [Install Linux and GPU Drivers](#install-linux-and-gpu-drivers)
     - [Step 0: Hardware Requirements](#step-0-hardware-requirements)
     - [Step 1: Install Ubuntu](#step-1-install-ubuntu)
     - [Step 2: Install Basic Development Software via CLI](#step-2-install-basic-development-software-via-cli)
@@ -28,8 +30,9 @@ Table of contents:
     - [External SSD for Storage](#external-ssd-for-storage)
   - [Sources, Related Links](#sources-related-links)
 
-## Install Linux
+## Install Linux and GPU Drivers
 
+This section explains step by step by step how to set up everything; the rest of the sections deal with usage details and applications.
 
 ### Step 0: Hardware Requirements
 
@@ -42,7 +45,7 @@ We need:
 Additionally, we should consider these requirements:
 
 - The laptop needs to have Thunderbolt 3 or superior port: here's where we're going to connect our external GPU.
-- Also, the laptop needs to have an NVIDIA GPU chip: devices which have graphics cards from other vendors than NVIDIA tend to have issues when NVIDIA drivers are installed; therefore, I would recommend a laptop which already has an integrated NVIDIA GPU, even though we will use the external, more powerful one.
+- Also, the laptop needs to have an NVIDIA GPU chip: devices which have graphics cards from other vendors than NVIDIA tend to have issues when NVIDIA drivers are ºed; therefore, I would recommend a laptop which already has an integrated NVIDIA GPU, even though we will use the external, more powerful one.
 - If you are going to buy an NVIDIA GPU, consider the VRAM necessary to load the models you would like to run, and the amount of data you plan to hold in memory (i.e., the size of a batch); for instance:
   - A batch of 128 RGB images of size 1024 x 1024 can weight between 0.75 GB (FP16) to 1.5 GB (FP32).
   - The object detection model [YOLOv8](https://huggingface.co/Ultralytics/YOLOv8) (with around 68M params) requires between 130 MB (FP16) and 260 MB (FP32) in memory.
@@ -399,7 +402,7 @@ Note that no one from the Internet can connect to our Ubuntu machine unless we e
 
 ## Using the GPU
 
-If we follow all the steps in the previous section [Install Linux](#install-linux), we should have a GPU up and running on our machine; we can check that as follows:
+If we follow all the steps in the previous section [Install Linux and GPU Drivers](#install-linux-and-gpu-drivers), we should have a GPU up and running on our machine; we can check that as follows:
 
 ```bash
 # On Ubuntu machine with eGPU connected before boot
@@ -442,6 +445,7 @@ rm Miniconda3-latest-Linux-x86_64.sh
 Then, we can create a `gpu` Python environment with the provided [`conda.yaml`](./conda.yaml):
 
 ```bash
+# Make sure that the line `pytorch-cuda=12.1` in conda.yaml is uncommented!
 conda env create -f conda.yaml
 conda activate gpu
 ```
@@ -512,7 +516,7 @@ Thanks to the VSCode [Remote-SSH Extension](https://code.visualstudio.com/docs/r
 Pre-requisites: 
 
 - Install the [Remote-SSH Extension](https://code.visualstudio.com/docs/remote/ssh). The section [Minimum VSCode Extensions](#minimum-vscode-extensions) below lists the extensions I frequently use.
-- Set up the Ubuntu machine as explained above: sections [Install Linux](#install-linux) and [Using the GPU](#using-the-gpu).
+- Set up the Ubuntu machine as explained above: sections [Install Linux and GPU Drivers](#install-linux-and-gpu-drivers) and [Using the GPU](#using-the-gpu).
 - Register the GPU environment to appear in the Jupyter Kernel list, as shown in the following:
 
 ```bash
@@ -550,7 +554,7 @@ Analogously to the VSCode use case, let's consider this scenario:
 
 Now, we'd like to work on the Macbook but use the powerful GPU from the Ubuntu to run an LLM.
 
-To that end, assuming our Ubuntu is configured as explained in the section sections [Install Linux](#install-linux) and [Using the GPU](#using-the-gpu), we can install and test [Ollama](https://ollama.com/) on our Ubuntu:
+To that end, assuming our Ubuntu is configured as explained in the section sections [Install Linux and GPU Drivers](#install-linux-and-gpu-drivers) and [Using the GPU](#using-the-gpu), we can install and test [Ollama](https://ollama.com/) on our Ubuntu:
 
 ```bash
 # Install Ollama CLI and a the service ollama.service
