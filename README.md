@@ -45,7 +45,7 @@ We need:
 Additionally, we should consider these requirements:
 
 - The laptop needs to have Thunderbolt 3 or superior port: here's where we're going to connect our external GPU.
-- Also, the laptop needs to have an NVIDIA GPU chip: devices which have graphics cards from other vendors than NVIDIA tend to have issues when NVIDIA drivers are ºed; therefore, I would recommend a laptop which already has an integrated NVIDIA GPU, even though we will use the external, more powerful one.
+- Also, the laptop needs to have an NVIDIA GPU chip: devices which have graphics cards from other vendors than NVIDIA tend to have issues when NVIDIA drivers are used; therefore, I would recommend a laptop which already has an integrated NVIDIA GPU, even though we will use the external, more powerful one.
 - If you are going to buy an NVIDIA GPU, consider the VRAM necessary to load the models you would like to run, and the amount of data you plan to hold in memory (i.e., the size of a batch); for instance:
   - A batch of 128 RGB images of size 1024 x 1024 can weight between 0.75 GB (FP16) to 1.5 GB (FP32).
   - The object detection model [YOLOv8](https://huggingface.co/Ultralytics/YOLOv8) (with around 68M params) requires between 130 MB (FP16) and 260 MB (FP32) in memory.

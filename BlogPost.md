@@ -18,14 +18,16 @@ docker rm excalidraw
 docker ps
 -->
 
-
-
 Title: My Personal eGPU Server Setup  
 Subtitle: How to Run and Train LLMs Locally with NVIDIA Chips from a Mac & Linux 
 
+![NVIDIA DGX Spark](./assets/workstation-dgx-spark-nvidia.jpg)
+
+This blog post is not about the [NVIDIA DGX Spark](https://www.nvidia.com/en-us/products/workstations/dgx-spark/). Instead, it's about my eGPU setup, the *personal supercomputer* I've been using the past 2 years. Image from [NVIDIA](https://nvidianews.nvidia.com/news/nvidia-dgx-spark-arrives-for-worlds-ai-developers)
+
 You have probably followed the release of the [NVIDIA DGX Spark](https://www.nvidia.com/en-us/products/workstations/dgx-spark/) *personal supercomputer*. The device, with 128 GB of memory, 20 CPU cores, and a price of USD $3,999.00, will be definitely on the wish list of any AI nerd for this Christmas.
 
-This blog post is my personal and humble alternative. Indeed, in the past 2 years I have been using a NVIDIA eGPU from my MacBook M1, but via a Linux machine, which plays the role of a server. Since some colleagues and friends showed interest, I decided to [**thoroughly document it on Github**](https://github.com/mxagar/linux_nvidia_egpu) and to write this blog post, which explains overall the setup and the motivation behind it. Here's the schematics of my *supercomputer*:
+This blog post is my personal and humble alternative. Indeed, in the past 2 years I have been using an NVIDIA eGPU (external GPU) from my MacBook M1, but via a Linux machine, which plays the role of a server. Since some colleagues and friends showed interest, I decided to [**thoroughly document it on Github**](https://github.com/mxagar/linux_nvidia_egpu) in the form of the guide I was looking for, but couldn't find completely. On the other hand, this blog post introduces the overall setup and the motivation behind it. Here's the schematics of my *supercomputer*:
 
 ![eGPU Linux & Mac Setup](./assets/egpu_linux.png)
 
@@ -49,21 +51,26 @@ You might also ask *why not stick to a single computer, Ubuntu or MacOS, with an
 - My preferred choice would be a MacOS with NVIDIA eGPU support, because NVIDIA chips are the industry standard.
 - Another option would be to upgrade my MacBook Pro M1 to a MacStudio M3 Ultra or similar, which comes with a very powerful processor -- but why should I leave aside my perfectly working M1?
 
-## Setup
+## Setup Guide
 
-The [Github repository](https://github.com/mxagar/linux_nvidia_egpu) covers all the steps and topics necessary
+The [Github repository](https://github.com/mxagar/linux_nvidia_egpu) covers all the questions and technical steps necessary to to get up and running a GPU:
 
-- [Hardware requirements](https://github.com/mxagar/linux_nvidia_egpu/tree/main?tab=readme-ov-file#step-0-hardware-requirements)
-- [Ubuntu installation](https://github.com/mxagar/linux_nvidia_egpu/tree/main?tab=readme-ov-file#step-1-install-ubuntu)
-- [Installation of NVIDIA libraries](https://github.com/mxagar/linux_nvidia_egpu/tree/main?tab=readme-ov-file#step-3-install-and-configure-nvidia-and-gpu-related-libraries)
-- [Installation of Docker with GPU support](https://github.com/mxagar/linux_nvidia_egpu/tree/main?tab=readme-ov-file#step-5-install-docker-with-nvidia-gpu-support)
-- [Remote access configuration](https://github.com/mxagar/linux_nvidia_egpu/tree/main?tab=readme-ov-file#step-6-remote-access-configuration)
+- [Hardware requirements](https://github.com/mxagar/linux_nvidia_egpu/tree/main?tab=readme-ov-file#step-0-hardware-requirements): *What hardware do I need for an eGPU setup? Which GPUs and enclosures are compatible? How much VRAM do typical ML models require?*
+- [Installation of Ubuntu](https://github.com/mxagar/linux_nvidia_egpu/tree/main?tab=readme-ov-file#step-1-install-ubuntu) and [NVIDIA libraries](https://github.com/mxagar/linux_nvidia_egpu/tree/main?tab=readme-ov-file#step-3-install-and-configure-nvidia-and-gpu-related-libraries): *How do I install and configure Ubuntu so it works smoothly with my external NVIDIA GPU?*
+
+Additionally, some extra but very practical aspects are covered in dedicated sections:
+
+- [Installation of Docker with GPU support](https://github.com/mxagar/linux_nvidia_egpu/tree/main?tab=readme-ov-file#step-5-install-docker-with-nvidia-gpu-support): Containerization has become crucial in the AI/ML industry; unfortunately, setting up deep learning or model-serving workloads inside images with full GPU acceleration is sometimes not that straightforward -- fear not: a simple yet working recipe is provided in this section.
+- [Remote access configuration](https://github.com/mxagar/linux_nvidia_egpu/tree/main?tab=readme-ov-file#step-6-remote-access-configuration): <shorten> This section explains how to securely connect to the Ubuntu GPU machine from another device (e.g., a MacBook) within the same local network.
+The motivation is to separate compute and interaction: using the Ubuntu box purely for heavy GPU tasks, while managing it comfortably from a lighter laptop.
+It covers how to identify the machine on the LAN, configure SSH access and firewall rules, and ensure that only local, trusted connections are allowed — keeping the system accessible for development but isolated from the Internet.
+In short, this step makes the GPU host both remotely usable and secure, enabling a clean local–remote workflow for training, serving, or experimentation. </shorten> 
 
 After the installation, we should be able to check our NVDIA eGPU via the Terminal on the Mac.
 
 ![MacOS NVIDIA SMI](./assets/mac_nvidia_smi.png)
 
-## Usage
+## Using the eGPU
 
 
 
