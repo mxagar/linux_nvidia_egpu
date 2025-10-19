@@ -1,3 +1,7 @@
+# Linux: uncomment `pytorch-cuda=12.1`
+# MacOS: comment out `pytorch-cuda=12.1`
+# conda env create -f conda.yaml
+# conda activate gpu
 name: gpu
 channels:
   - pytorch
@@ -10,7 +14,7 @@ dependencies:
   - pytorch=2.4
   - torchvision
   - torchaudio
-  - pytorch-cuda=12.1
+  #- pytorch-cuda=12.1
   - numpy
   - scipy
   - pandas
