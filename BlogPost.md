@@ -73,6 +73,25 @@ Snapshot of the `nvidia-smi` output on the Ubuntu machine (hostname: `urgull`) b
 
 Once we get the correct output from `nvidia-smi`, we can start using the eGPU. To that end, the [Github repository](https://github.com/mxagar/linux_nvidia_egpu) contains a simple Jupyter notebook we can run: [test_gpu.ipynb](https://github.com/mxagar/linux_nvidia_egpu/blob/main/test_gpu.ipynb).
 
+Here's the steps we need to follow:
+
+1. Open the MacBook Terminal (make sure no VPN connections are active).
+2. SSH to the Ubuntu machine with our credentials.
+3. Clone any repository, for instance the [Github repository](https://github.com/mxagar/linux_nvidia_egpu) with the notebook [test_gpu.ipynb](https://github.com/mxagar/linux_nvidia_egpu/blob/main/test_gpu.ipynb).
+4. 
+
+Steps 1-3 are carried out with these commands:
+
+```bash
+# -- MacBook
+ssh <username>@<hostname-ubuntu>.local
+ssh mikel@urgull.local
+
+# -- Ubuntu via MacBook
+cd && mkdir git_repositories && cd git_repositories
+git clone https://github.com/mxagar/linux_nvidia_egpu.git
+```
+
 
 
 Macbook vs NVIDIA comparison
