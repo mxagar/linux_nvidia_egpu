@@ -95,9 +95,10 @@ conda env create -f conda.yaml
 
 *Open Remote Window* (bottom left corner) > *Connect to Host...*. Then, we enter the user and host as in `<username>@<hostname-ubuntu>.local`, followed by the password and we have already a VSCode instance running on the Ubuntu machine, but interfaced by the MacBook UI.
 
-Explorer menu (left menu bar) we click on *Open Folder...* and open our cloned repo in `~/git_repositories/linux_nvidia_egpu`.
+Explorer menu (left menu bar) we click on *Open Folder* and open our cloned repo in `~/git_repositories/linux_nvidia_egpu`.
 
-
+A simple CNN is trained with the MNIST dataset (~45MB) and the eGPU is almost 2x faster than the MacBook Pro M1 (37 sec. vs. 62 sec.).
+My MacBook has a *unified memory* of 16GB, vs. the 12GB VRAM of the RTX 3060; that might seem disadvantageous, but in practice it is not: I can load larger models on the eGPU using its dedicated memory, because the Apple memory is shared between CPU and GPU, which can lead to bottlenecks.
 
 Macbook vs NVIDIA comparison
 
