@@ -61,14 +61,13 @@ The [Github repository](https://github.com/mxagar/linux_nvidia_egpu) covers all 
 Additionally, some extra but very practical aspects are covered in dedicated sections:
 
 - [Installation of Docker with GPU support](https://github.com/mxagar/linux_nvidia_egpu/tree/main?tab=readme-ov-file#step-5-install-docker-with-nvidia-gpu-support): Containerization has become crucial in the AI/ML industry; unfortunately, setting up deep learning or model-serving workloads inside images with full GPU acceleration is sometimes not that straightforward -- fear not: a simple yet working recipe is provided in this section.
-- [Remote access configuration](https://github.com/mxagar/linux_nvidia_egpu/tree/main?tab=readme-ov-file#step-6-remote-access-configuration): <shorten> This section explains how to securely connect to the Ubuntu GPU machine from another device (e.g., a MacBook) within the same local network.
-The motivation is to separate compute and interaction: using the Ubuntu box purely for heavy GPU tasks, while managing it comfortably from a lighter laptop.
-It covers how to identify the machine on the LAN, configure SSH access and firewall rules, and ensure that only local, trusted connections are allowed — keeping the system accessible for development but isolated from the Internet.
-In short, this step makes the GPU host both remotely usable and secure, enabling a clean local–remote workflow for training, serving, or experimentation. </shorten> 
+- [Remote access configuration](https://github.com/mxagar/linux_nvidia_egpu/tree/main?tab=readme-ov-file#step-6-remote-access-configuration): This section explains how to securely connect to the Ubuntu GPU machine from another device (e.g., a MacBook) within the same local network.
 
-After the installation, we should be able to check our NVDIA eGPU via the Terminal on the Mac.
+After the installation, we should be able to check our NVIDIA eGPU via the Terminal on the Mac.
 
 ![MacOS NVIDIA SMI](./assets/mac_nvidia_smi.png)
+
+Snapshot of the `nvidia-smi` output on the Ubuntu machine (`urgull`) but executed from my MacBook. We can see the eGPU and its load: NVIDIA GeForce RTX 3060, 14W / 170W used, 26MiB / 12288MiB used.
 
 ## Using the eGPU
 
