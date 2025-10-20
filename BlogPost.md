@@ -78,9 +78,9 @@ Here's the steps we need to follow:
 1. Open the MacBook Terminal (make sure no VPN connections are active).
 2. SSH to the Ubuntu machine with our credentials.
 3. Clone any repository, for instance the [Github repository](https://github.com/mxagar/linux_nvidia_egpu) with the notebook [test_gpu.ipynb](https://github.com/mxagar/linux_nvidia_egpu/blob/main/test_gpu.ipynb).
-4. 
+4. Install the GPU conda environment.
 
-Steps 1-3 are carried out with these commands:
+Steps 1-4 are carried out with these commands:
 
 ```bash
 # -- MacBook
@@ -90,7 +90,12 @@ ssh mikel@urgull.local
 # -- Ubuntu via MacBook
 cd && mkdir git_repositories && cd git_repositories
 git clone https://github.com/mxagar/linux_nvidia_egpu.git
+conda env create -f conda.yaml
 ```
+
+*Open Remote Window* (bottom left corner) > *Connect to Host...*. Then, we enter the user and host as in `<username>@<hostname-ubuntu>.local`, followed by the password and we have already a VSCode instance running on the Ubuntu machine, but interfaced by the MacBook UI.
+
+Explorer menu (left menu bar) we click on *Open Folder...* and open our cloned repo in `~/git_repositories/linux_nvidia_egpu`.
 
 
 
