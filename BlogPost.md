@@ -100,6 +100,8 @@ Explorer menu (left menu bar) we click on *Open Folder* and open our cloned repo
 A simple CNN is trained with the MNIST dataset (~45MB) and the eGPU is almost 2x faster than the MacBook Pro M1 (37 sec. vs. 62 sec.).
 My MacBook has a *unified memory* of 16GB, vs. the 12GB VRAM of the RTX 3060; that might seem disadvantageous, but in practice it is not: I can load larger models on the eGPU using its dedicated memory, because the Apple memory is shared between CPU and GPU, which can lead to bottlenecks.
 
+![VSCode Remote Window](./assets/mac_ubuntu_egpu_vscode.png)
+
 Macbook vs NVIDIA comparison
 
 VSCode
