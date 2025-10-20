@@ -97,7 +97,7 @@ conda env create -f conda.yaml
 
 Explorer menu (left menu bar) we click on *Open Folder...* and open our cloned repo in `~/git_repositories/linux_nvidia_egpu`.
 
-
+![VSCode Remote Window](./assets/mac_ubuntu_egpu_vscode.png)
 
 Macbook vs NVIDIA comparison
 
