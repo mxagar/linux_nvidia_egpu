@@ -41,8 +41,8 @@ You might ask *why I would want to run and train models locally*, since we have 
 
 - Many models (LLMs or any other DL networks) can be used locally for a **fraction of the cost** required by cloud providers; in fact, the [NVIDIA RTX 3060](https://www.nvidia.com/en-us/geforce/graphics-cards/30-series/rtx-3060-3060ti/) with 12 GB is quite similar to the often offered low tier GPU, the [NVIDIA T4](https://www.nvidia.com/en-us/data-center/tesla-t4/).
 - <elaborate> Use data **confidentially**: personal documents, corporate documents with export protection, etc. </elaborate>
-- <elaborate> **Learn** how to set up hardware, firmware software. </elaborate>
-- <elaborate> **Avoid dependence** on cloud services. </elaborate>
+- <elaborate> **Avoid dependence** on cloud services. They can increase prices or fail at any moment. Examples are when [AWS went down in December 2021](https://techcrunch.com/2021/12/07/amazon-web-services-went-down-and-took-a-bunch-of-the-internet-with-it/) or the more recent [AWS outage in October 2025](https://www.wired.com/story/what-that-huge-aws-outage-reveals-about-the-internet/) </elaborate>
+- <elaborate> **Learn** how to set up hardware, firmware, software. </elaborate>
 
 You might also ask *why not stick to a single computer, Ubuntu or MacOS, with an attached eGPU*. The question has several layers:
 
