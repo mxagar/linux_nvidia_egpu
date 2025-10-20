@@ -71,9 +71,9 @@ Snapshot of the `nvidia-smi` output on the Ubuntu machine (hostname: `urgull`) b
 
 ## Using the eGPU
 
+Once we get the correct output from `nvidia-smi`, we can start using the eGPU. To that end, the [Github repository](https://github.com/mxagar/linux_nvidia_egpu) contains a simple Jupyter notebook we can run: [test_gpu.ipynb](https://github.com/mxagar/linux_nvidia_egpu/blob/main/test_gpu.ipynb).
 
 
-[test_gpu.ipynb](https://github.com/mxagar/linux_nvidia_egpu/blob/main/test_gpu.ipynb)
 
 Macbook vs NVIDIA comparison
 
