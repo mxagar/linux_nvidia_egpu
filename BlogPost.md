@@ -25,9 +25,17 @@ Subtitle: How to Run and Train LLMs Locally with NVIDIA Chips from a Mac & Linux
 
 This blog post is not about the [NVIDIA DGX Spark](https://www.nvidia.com/en-us/products/workstations/dgx-spark/). Instead, it's about my eGPU setup, the *personal supercomputer* I've been using the past 2 years. Image from [NVIDIA](https://nvidianews.nvidia.com/news/nvidia-dgx-spark-arrives-for-worlds-ai-developers)
 
+<div style="border: 1px solid #e4f312ff; background-color: #fcd361b9; padding: 1em; border-radius: 6px;">
+<strong>
+Note: This blog post has a companion
+<a href="https://github.com/mxagar/linux_nvidia_egpu">GitHub repository</a>
+with a detailed guide.
+</strong>
+</div>
+
 You have maybe followed the release of the [NVIDIA DGX Spark](https://www.nvidia.com/en-us/products/workstations/dgx-spark/) *personal supercomputer*. The device, with 128 GB of memory, 20 CPU cores, and a price of USD $3,999.00, will be definitely on the wish list of any AI nerd for this Christmas.
 
-This blog post is my personal and humble alternative. Indeed, in the past 2 years I have been using an NVIDIA eGPU (external GPU) from my MacBook M1, but via a Linux machine, which plays the role of a server. Since some colleagues and friends showed interest, I decided to [**thoroughly document it on Github**](https://github.com/mxagar/linux_nvidia_egpu) in the form of the guide I was looking for, but couldn't find completely. On the other hand, this blog post introduces the overall setup and the motivation behind it. Here's the schematics of my *supercomputer*:
+This blog post is my personal and humble alternative. Indeed, in the past 2 years I have been using an NVIDIA eGPU (external GPU) from my MacBook M1, but via a Linux machine, which plays the role of a server. Since some colleagues and friends showed interest, I decided to [thoroughly document it on Github](https://github.com/mxagar/linux_nvidia_egpu) in the form of the guide I was looking for, but couldn't find completely. On the other hand, this blog post introduces the overall setup and the motivation behind it. Here's the schematics of my *supercomputer*:
 
 ![eGPU Linux & Mac Setup](./assets/egpu_linux.png)
 
@@ -69,15 +77,15 @@ After the installation, we should be able to check our NVIDIA eGPU via the Termi
 
 Snapshot of the `nvidia-smi` output on the Ubuntu machine (hostname: `urgull`) but executed from my MacBook (hostname: `kasiopeia`). We can see the eGPU and its load: NVIDIA GeForce RTX 3060, 14W / 170W used, 26MiB / 12288MiB used.
 
-## Using the eGPU
+## Using the eGPU: Remote VSCode and Ollama
 
-Once we get the correct output from `nvidia-smi`, we can start using the eGPU. To that end, the [Github repository](https://github.com/mxagar/linux_nvidia_egpu) contains a simple Jupyter notebook we can run: [test_gpu.ipynb](https://github.com/mxagar/linux_nvidia_egpu/blob/main/test_gpu.ipynb).
+Once we get the correct output from `nvidia-smi`, we can start using the eGPU. To that end, the [guide Github repository](https://github.com/mxagar/linux_nvidia_egpu) contains a simple Jupyter notebook we can run: [test_gpu.ipynb](https://github.com/mxagar/linux_nvidia_egpu/blob/main/test_gpu.ipynb).
 
-Here's the steps we need to follow:
+The way I prefer to run complete repositories remotely (i.e., on the Ubuntu machine but interfaced from the MacBook) is using a [**Remote VSCode**](https://code.visualstudio.com/docs/remote/ssh) instance. To start one, these are the preliminary steps we need to follow:
 
 1. Open the MacBook Terminal (make sure no VPN connections are active).
 2. SSH to the Ubuntu machine with our credentials.
-3. Clone any repository, for instance the [Github repository](https://github.com/mxagar/linux_nvidia_egpu) with the notebook [test_gpu.ipynb](https://github.com/mxagar/linux_nvidia_egpu/blob/main/test_gpu.ipynb).
+3. Clone the [Github repository](https://github.com/mxagar/linux_nvidia_egpu) with the notebook [test_gpu.ipynb](https://github.com/mxagar/linux_nvidia_egpu/blob/main/test_gpu.ipynb).
 4. Install the GPU conda environment.
 
 Steps 1-4 are carried out with these commands:
@@ -93,19 +101,72 @@ git clone https://github.com/mxagar/linux_nvidia_egpu.git
 conda env create -f conda.yaml
 ```
 
-*Open Remote Window* (bottom left corner) > *Connect to Host...*. Then, we enter the user and host as in `<username>@<hostname-ubuntu>.local`, followed by the password and we have already a VSCode instance running on the Ubuntu machine, but interfaced by the MacBook UI.
+Then, we can start a remote VSCode instance:
 
-Explorer menu (left menu bar) we click on *Open Folder* and open our cloned repo in `~/git_repositories/linux_nvidia_egpu`.
+5. We open VSCode on our MacBook.
+6. Click on *Open Remote Window* (bottom left corner) > *Connect to Host...*.
+7. We enter the user and host as in `<username>@<hostname-ubuntu>.local`, followed by the password.
 
-A simple CNN is trained with the MNIST dataset (~45MB) and the eGPU is almost 2x faster than the MacBook Pro M1 (37 sec. vs. 62 sec.).
+... *et voilà*: we have already a VSCode instance running on the Ubuntu machine, but interfaced by the MacBook UI! Now, we can open any folder, including the one with the notebook:
 
-My MacBook has a *unified memory* of 16GB, vs. the 12GB VRAM of the RTX 3060; that might seem disadvantageous, but in practice it is not: I can load larger models on the eGPU using its dedicated memory, because the Apple memory is shared between CPU and GPU, which can lead to bottlenecks. Actually, I would choose every time a larger VRAM over a faster GPU with shared memory.
+8. Click on *Explorer menu* (left menu bar) > *Open Folder*.
+9. And, finally, load our repository cloned in `~/git_repositories/linux_nvidia_egpu`.
+
+Once we select the `gpu` environment kernel for the [test_gpu.ipynb](https://github.com/mxagar/linux_nvidia_egpu/blob/main/test_gpu.ipynb) notebook, we can start executing its cells. Among others, a simple CNN is trained with the MNIST dataset (~45MB) and *the eGPU is almost 2x faster than the MacBook Pro M1* (37 sec. vs. 62 sec.). In terms of memory, my MacBook has a *unified memory* of 16GB, vs. the 12GB VRAM of the RTX 3060; it might seem that the NVIDIA chip is worse, but in practice it is not: I can load larger models using its dedicated memory, because the Apple memory is shared between CPU and GPU, which can lead to bottlenecks.
 
 ![VSCode Remote Window](./assets/mac_ubuntu_egpu_vscode.png)
 
+Snapshot of the remote VSCode instance: the repository is on the Ubuntu machine with leveraging the eGPU (hostname: `urgull`), but interfaced from my MacBook (hostname: `kasiopeia`).
+
+<p align="center"── ◆ ──</p>
+
+Another application I use quite extensively with the eGPU is [**Ollama**](https://ollama.com/), which enables *local* Large Language Models (LLMs) for a plethora of tasks.
+
+To run Ollama on the eGPU but interfaced from the MacBook, first, we need to [install it](https://github.com/mxagar/linux_nvidia_egpu?tab=readme-ov-file#ollama-server-use-ollama-llms-running-on-the-gpu-ubuntu-but-from-another-machine) properly on both machines. Then, we can follow these easy commands to start a chatbot via the CLI:
+
+```bash
+# -- Ubuntu (...or via ssh from MacBook)
+# Make sure Ollama uses GPU and is accessible in our LAN
+export OLLAMA_USE_GPU=1
+export OLLAMA_HOST=0.0.0.0:11434
+# Download a 9.1GB model (takes some minutes) and start the Ollama server
+ollama pull gemma3:12b
+ollama serve &
+
+# -- MacBook
+# Change the Ollama host to the Ubuntu machine
+export OLLAMA_HOST=urgull.local:11434
+ollama run gemma3:12b
+# ... now we can chat :)
+
+# To revert to use the local MacBook Ollama service
+export OLLAMA_HOST=127.0.0.1:11434
 ```
 
-```
+The result is summarized on the following snapshot:
 
 ![Ollama on eGPU](./assets/mac_ubuntu_egpu_ollama.png)
+
+[Gemma 3 12B](https://deepmind.google/models/gemma/gemma-3/) running on the Ubuntu eGPU via Ollama, but operated from the MacBook.
+
+The Ollama server can be also reached from our LAN using `cURL`:
+
+```bash
+curl http://urgull.local:11434/api/generate -d '{
+  "model": "gemma3:12b",
+  "prompt": "Write a haiku about machine learning."
+}'
+```
+
+Of course, there are many useful and more interesting downstream applications:
+
+- Private chatbot with proper GUI, history, document upload and internet access
+- Copilot-style code completion
+- Agents: Autonomous CLI Agents, Local Operator, Ollama MCP Agent, etc.
+- ...
+
+However, those applications are not in the scope of this post &mdash; maybe I will introduce them in another one ;)
+
+## Wrap Up
+
 
