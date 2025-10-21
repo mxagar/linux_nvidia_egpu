@@ -87,7 +87,7 @@ Summary of the steps to follow:
   - No Active Directory
   - Bitlocker warnings: I decided to wipe out the disk.
 
-I originally installed the Ubuntu version `24.04`, but it lead to random freezes. Apparently, that could be related some incompabilities between the Desktop GUI and the NVIDIA drivers.
+I originally installed the Ubuntu version `24.04`, but it lead to random freezes. Apparently, that could be related some incompatibilities between the Desktop GUI and the NVIDIA drivers.
 In case you need to perform an upgrade, you can check [this post](https://www.omgubuntu.co.uk/2024/10/how-to-upgrade-to-ubuntu-24-10).
 
 To upgrade versions via CLI and check the version we have:
@@ -319,7 +319,7 @@ docker run --rm --gpus all nvidia/cuda:12.4.1-base-ubuntu22.04 nvidia-smi
 I will be working with two machines:
 
 - The Ubuntu machine (hostname `urgull`), which has a GPU attached to it.
-- A Macbook Pro as the main UI (hostname `kasiopeia`), from which I would like to connect to the Ubuntu machine whenever I need to use the GPU.
+- A MacBook Pro as the main UI (hostname `kasiopeia`), from which I would like to connect to the Ubuntu machine whenever I need to use the GPU.
 
 In order to connect to our Ubuntu machine from the Mac, we need to
 
@@ -506,10 +506,10 @@ I will be adding more examples, if I consider them interesting and I get some ti
 
 Let's consider this scenario:
 
-- we have our usual workstation, which is a Macbook (hostname `kasiopeia`)
+- we have our usual workstation, which is a MacBook (hostname `kasiopeia`)
 - and we also have another machine with a GPU, i.e., the Ubuntu we have configured so far (hostname: `urgull`).
 
-We'd like to work on the Macbook but use the powerful GPU from the Ubuntu.
+We'd like to work on the MacBook but use the powerful GPU from the Ubuntu.
 
 Thanks to the VSCode [Remote-SSH Extension](https://code.visualstudio.com/docs/remote/ssh), that's very easy to achieve!
 
@@ -531,13 +531,13 @@ conda activate gpu
 python -m ipykernel install --user --name=gpu --display-name "Python (gpu)"
 ```
 
-After that, we can easily open a VSCode instance on our Macbook and connect to the Ubuntu from it:
+After that, we can easily open a VSCode instance on our MacBook and connect to the Ubuntu from it:
 
 - Click on the button *Open a Remote Window*, on the bottom left corner.
 - Connect to a host...
 - Enter: `<user>@<ubuntu-ip>` or, if configured `<user>@<ubuntu-hostname>.local`
 - Enter Ubuntu user password
-- ... et voilà! Our VSCode on the Macbook is actually running on Ubuntu.
+- ... et voilà! Our VSCode on the MacBook is actually running on Ubuntu.
 
 Now, we can open the VSCode Terminal, which will launch on Ubuntu.
 
@@ -549,10 +549,10 @@ If we open the current repository, we can run the notebook [`test_gpu.ipynb`](./
 
 Analogously to the VSCode use case, let's consider this scenario:
 
-- we have our usual workstation, which is a Macbook (hostname `kasiopeia`)
+- we have our usual workstation, which is a MacBook (hostname `kasiopeia`)
 - and we also have another machine with a GPU, i.e., the Ubuntu we have configured so far (hostname `urgull`).
 
-Now, we'd like to work on the Macbook but use the powerful GPU from the Ubuntu to run an LLM.
+Now, we'd like to work on the MacBook but use the powerful GPU from the Ubuntu to run an LLM.
 
 To that end, assuming our Ubuntu is configured as explained in the section sections [Install Linux and GPU Drivers](#install-linux-and-gpu-drivers) and [Using the GPU](#using-the-gpu), we can install and test [Ollama](https://ollama.com/) on our Ubuntu:
 
@@ -649,7 +649,7 @@ ollama serve &
 # export OLLAMA_MODELS=~/.ollama/models
 ``` 
 
-Then, we can use the Ollama API running on the Ubuntu machine from our Macbook:
+Then, we can use the Ollama API running on the Ubuntu machine from our MacBook:
 
 ```bash
 # Get the models we have available
@@ -664,13 +664,13 @@ curl http://urgull.local:11434/api/generate -d '{
 }'
 ```
 
-If we install Ollama on the Macbook, we can even use the Ollama service on the Mac, but letting the model run on the Ubuntu with the more powerful GPU!
+If we install Ollama on the MacBook, we can even use the Ollama service on the Mac, but letting the model run on the Ubuntu with the more powerful GPU!
 
 ```bash
-# Install Ollama on the Macbook
+# Install Ollama on the MacBook
 curl -fsSL https://ollama.com/install.sh | sh
 
-# We can even run the local Ollama on Macbook
+# We can even run the local Ollama on MacBook
 # but using the Ubuntu server
 export OLLAMA_HOST=urgull.local:11434
 ollama run llama3:8b
@@ -760,5 +760,5 @@ ln -s /media/$USER/poseidon/data ~/data
 ## Sources, Related Links
 
 - [Enable Razer CoreX (NV-1070) eGPU on Razer Blade Stealth (NV-MX150) running Ubuntu 20.04](https://gist.github.com/tanmayyb/d19f9aa5641349f8830d05e2c91d5a79)
-- [Guide for setting up e-gpu with framework 11th gen and Ubuntu 22.04](https://www.reddit.com/r/framework/comments/11dtm78/guide_for_setting_up_egpu_with_framework_11th_gen/)
-- [Guide to install nvidia eGpu on ubuntu 22.04](https://gist.github.com/valteu/1c0a9b7288cc3d77a6654a4d22d0ce9f)
+- [Guide for setting up e-GPU with framework 11th Gen and Ubuntu 22.04](https://www.reddit.com/r/framework/comments/11dtm78/guide_for_setting_up_egpu_with_framework_11th_gen/)
+- [Guide to install NVIDIA eGPU on ubuntu 22.04](https://gist.github.com/valteu/1c0a9b7288cc3d77a6654a4d22d0ce9f)

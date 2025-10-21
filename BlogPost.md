@@ -88,7 +88,7 @@ ssh <username>@<hostname-ubuntu>.local
 ssh mikel@urgull.local
 
 # -- Ubuntu via MacBook
-cd && mkdir git_repositories && cd git_repositories
+cd && mkdir -p git_repositories && cd git_repositories
 git clone https://github.com/mxagar/linux_nvidia_egpu.git
 conda env create -f conda.yaml
 ```
@@ -98,14 +98,14 @@ conda env create -f conda.yaml
 Explorer menu (left menu bar) we click on *Open Folder* and open our cloned repo in `~/git_repositories/linux_nvidia_egpu`.
 
 A simple CNN is trained with the MNIST dataset (~45MB) and the eGPU is almost 2x faster than the MacBook Pro M1 (37 sec. vs. 62 sec.).
-My MacBook has a *unified memory* of 16GB, vs. the 12GB VRAM of the RTX 3060; that might seem disadvantageous, but in practice it is not: I can load larger models on the eGPU using its dedicated memory, because the Apple memory is shared between CPU and GPU, which can lead to bottlenecks.
+
+My MacBook has a *unified memory* of 16GB, vs. the 12GB VRAM of the RTX 3060; that might seem disadvantageous, but in practice it is not: I can load larger models on the eGPU using its dedicated memory, because the Apple memory is shared between CPU and GPU, which can lead to bottlenecks. Actually, I would choose every time a larger VRAM over a faster GPU with shared memory.
 
 ![VSCode Remote Window](./assets/mac_ubuntu_egpu_vscode.png)
 
-Macbook vs NVIDIA comparison
+```
 
-VSCode
+```
 
-Ollama
-
+![Ollama on eGPU](./assets/mac_ubuntu_egpu_ollama.png)
 
