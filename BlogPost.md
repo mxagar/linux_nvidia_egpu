@@ -1,5 +1,12 @@
-# eGPU Blog Post
-
+---
+layout: post
+title:  "My Personal eGPU Server Setup"
+subtitle: "How to Run and Train LLMs Locally with NVIDIA Chips from a Mac & Linux"
+date:   2025-10-21 12:30:00 +0200
+categories: eGPU, AI engineering, LLM, machine learning, Ollama, Remote VSCode, Linux, deep learning, model training, model inference
+permalink: /blog/mac-os-ubuntu-egpu.html
+comments: true
+---
 <!--
 # Log in/out to Docker Hub
 docker logout
@@ -18,12 +25,18 @@ docker rm excalidraw
 docker ps
 -->
 
-Title: My Personal eGPU Server Setup  
-Subtitle: How to Run and Train LLMs Locally with NVIDIA Chips from a Mac & Linux 
+<h1 style="color:grey;font-style:italic">{% if page.subtitle %}{{ page.subtitle }}{% endif %}
+</h1>
 
-![NVIDIA DGX Spark](./assets/workstation-dgx-spark-nvidia.jpg)
+<div style="line-height:150%;">
+    <br>
+</div>
 
-This blog post is not about the [NVIDIA DGX Spark](https://www.nvidia.com/en-us/products/workstations/dgx-spark/). Instead, it's about my eGPU setup, the *personal supercomputer* I've been using the past 2 years. Image from [NVIDIA](https://nvidianews.nvidia.com/news/nvidia-dgx-spark-arrives-for-worlds-ai-developers)
+<p align="center">
+<img src="./assets/workstation-dgx-spark-nvidia.jpg" alt="NVIDIA DGX Spark" width="1000"/>
+<small style="color:grey">This blog post is not about the <a href="https://www.nvidia.com/en-us/products/workstations/dgx-spark/">NVIDIA DGX Spark</a>. Instead, it's about my eGPU setup, the *personal supercomputer* I've been using the past 2 years. Image from <a href="https://nvidianews.nvidia.com/news/nvidia-dgx-spark-arrives-for-worlds-ai-developers">NVIDIA</a>.
+</small>
+</p>
 
 <div style="border: 1px solid #e4f312ff; background-color: #fcd361b9; padding: 1em; border-radius: 6px;">
 <strong>
