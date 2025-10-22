@@ -4,7 +4,7 @@ title:  "My Personal eGPU Server Setup"
 subtitle: "How to Run and Train LLMs Locally with NVIDIA Chips from a Mac & Linux"
 date:   2025-10-21 12:30:00 +0200
 categories: eGPU, AI engineering, LLM, machine learning, Ollama, Remote VS Code, Linux, deep learning, model training, model inference
-permalink: /blog/mac-os-ubuntu-egpu.html
+permalink: /blog/mac-os-ubuntu-nvidia-egpu.html
 comments: true
 ---
 <!--
