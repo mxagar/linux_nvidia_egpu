@@ -2,7 +2,8 @@
 
 Notes on how to use NVIDIA eGPUs on Linux.
 
-For more information on the motivation, check my blog post: [https://github.com/mxagar/linux_nvidia_egpu](https://github.com/mxagar/linux_nvidia_egpu),
+For more information on the motivation, check my blog post: [My Personal eGPU Server Setup](https://mikelsagardia.io/blog/mac-os-ubuntu-nvidia-egpu.html).
+
 
 Table of contents:
 
@@ -69,6 +70,8 @@ Specifically, this is my setup:
 	- NVMe SSD: SK Hynix 512 GB
 - [Gigabyte NVIDIA GeForce RTX 3060 Gaming OC 12 GB V2 LHR](https://www.gigabyte.com/Graphics-Card/GV-N3060GAMING-OC-12GD-rev-20)
 - [Razer Core X External Case for Thunderbolt 3 Graphics Card](https://www.razer.com/mena-en/gaming-laptops/razer-core-x)
+
+![My eGPU Setup](./assets/egpu_linux.png)
 
 ### Step 1: Install Ubuntu
 
@@ -218,6 +221,8 @@ nvidia-smi
 # Loop call for refeshed outputs
 nvidia-smi -l 1
 ```
+
+![Ubuntu `nvidia-smi` Output](./assets/ubuntu_nvidia_smi.png)
 
 ### Step 5: Install Docker with NVIDIA GPU Support
 
@@ -400,6 +405,8 @@ Note that no one from the Internet can connect to our Ubuntu machine unless we e
 - Our router is visible to the Internet with another **different public IP**.
 - Our Ubuntu's SSH (port 22) and Ollama (port 11434) are not accessible from the Internet unless we manually tell our router to port-forward those ports.
 
+![MacBook `nvidia-smi` Output](./assets/mac_nvidia_smi.png)
+
 ## Using the GPU
 
 If we follow all the steps in the previous section [Install Linux and GPU Drivers](#install-linux-and-gpu-drivers), we should have a GPU up and running on our machine; we can check that as follows:
@@ -499,6 +506,8 @@ The notebook [`test_gpu.ipynb`](./test_gpu.ipynb) contains some quick tests to s
 - MNIST Training Test
 
 I will be adding more examples, if I consider them interesting and I get some time ;)
+
+![MacBook VS Code eGPU Usage](./assets/mac_ubuntu_egpu_vscode.png)
 
 ## Further Useful Applications
 
@@ -679,6 +688,8 @@ ollama run llama3:8b
 export OLLAMA_HOST=127.0.0.1:11434
 ollama run llama3:8b
 ```
+
+![MacBook Ollama Usage](./assets/mac_ubuntu_egpu_ollama.png)
 
 ## Extra: Minimum Personal Migration Checklist
 
